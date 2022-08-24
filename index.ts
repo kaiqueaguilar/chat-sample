@@ -1,41 +1,27 @@
-import Fastify from 'fastify';
-import WebSocket from '@fastify/websocket';
+import Express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 import { PrismaClient, User, Message } from '@prisma/client'
 
 
 const db = new PrismaClient()
-const server = Fastify();
-server.register(WebSocket);
+const app = Express();
+const server = http.createServer(app);
+const io = new Server(server);
 
-
-server.get('/',  (req, res) => {
-  res.send('hello world');
-});
-
-server.post<{ Body: { name : string } }>('/create-user', async (req, res) => {
-  const user = await db.user.create({ data: req.body })
+app.post<{ name: string }>('/create-user', async (req, res) => {
+  const user = await db.user.create({
+    data: {
+      name: req.body.name
+    }
+  })
   res.send(user);
 });
 
-server.post<{ Params: { userId: number } }>('/message', { websocket: true }, (connection, req) => {
-  connection.socket.on('message', async (message: string) => {
-
-    const data = await db.message.create({
-      data: {
-        user_id: req.params.userId,
-        text: message,
-      }
-    });
-    
-    connection.socket.send(data);
-  });
+io.on('connection', (socket) => {
+  console.log('a user connected');
 });
 
-
-server.listen({ port: 3003 }, (err, address) => {
-  if (err) {
-    server.log.error(err)
-    process.exit(1)
-  }
-  console.log(`server listening on ${address}`)
+server.listen(3000, () => {
+  console.log('listening on *:3000');
 });
