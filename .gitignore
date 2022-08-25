@@ -2,4 +2,4 @@ node_modules
 build
 dist
 *.lock
-/db/*.sqlite3
+/prisma/database.db
