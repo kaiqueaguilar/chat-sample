@@ -1,0 +1,1 @@
+Run: `yarn` > `yarn prisma migrate dev -n init` > `yarn start`
