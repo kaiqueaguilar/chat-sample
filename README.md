@@ -1,1 +1,1 @@
-Run: `yarn` > `yarn prisma db pull` > `yarn start`
+Run: `yarn` > `yarn prisma db push` > `yarn start`
